@@ -1,7 +1,7 @@
 public class CiclicQueue <E> implements Queue<E>{
 
     protected final int DEFAULT_TAIL = -1;
-    protected final int DEFAULT_HEAD = 0;
+    protected final int DEFAULT_HEAD = -1;
 
     protected final E[] data;
     protected int size;
@@ -20,9 +20,11 @@ public class CiclicQueue <E> implements Queue<E>{
             return false;
         }
 
-        //организовать закольцовывание
+        if (head == -1) { head = 0;}
 
-        data[++tail] = value;
+        tail = (++tail) % data.length;
+
+        data[tail] = value;
         size++;
         return true;
     }
@@ -32,12 +34,15 @@ public class CiclicQueue <E> implements Queue<E>{
         if (isEmpty()) {
             return null;
         }
-
-        //закольцовывание
-
-        E value = data[head++];
-//        data[head] = null;
-        size--;
+        E value = data[head];
+        data[head] = null;
+        if (head == tail) {
+            head = -1;
+            tail = -1;
+        } else {
+            head = (++head) % data.length;
+        }
+            size--;
         return value;
     }
 
@@ -69,9 +74,9 @@ public class CiclicQueue <E> implements Queue<E>{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[");
-        for (int i = head; i <= tail; i++) {
+        for (int i = 0; i <= data.length-1; i++) {
             sb.append(data[i]);
-            if (i != tail) {
+            if (i != data.length-1) {
                 sb.append(", ");
             }
         }
